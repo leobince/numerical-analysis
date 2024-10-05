@@ -1,0 +1,138 @@
+\documentclass[a4paper]{article}
+\usepackage[affil-it]{authblk}
+\usepackage{geometry}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\begin{document}
+% =================================================
+\title{Numerical Analysis Homework \#2}
+
+\author{Bince Qu 3220105862
+  \thanks{Electronic address: \texttt{3220105862@zju.edu.cn}}}
+\affil{Collage of Mathmatics, Zhejiang University }
+
+\date{Due time: \today}
+
+\maketitle
+
+\begin{abstract}
+    In this project, we implemented the bisection method, Newton's method, and the secant method in C++ to solve nonlinear equations. We tested our implementations on various functions and intervals, and analyzed the results.
+\end{abstract}
+
+% ============================================
+\section*{I. Briefly Repeat the Problem}
+
+The objective is to implement the bisection method, Newton's method, and the secant method in a C++ package. We need to:
+
+\begin{itemize}
+    \item Design an abstract base class \texttt{EquationSolver} with a pure virtual method \texttt{solve}.
+    \item Write a derived class of \texttt{EquationSolver} for each method to accommodate its particularities in solving nonlinear equations.
+    \item Test the implementations on various functions and intervals.
+\end{itemize}
+
+% ============================================
+\section*{II. Implementation Details}
+
+We designed an abstract base class \texttt{EquationSolver} with a pure virtual function \texttt{solve()}. For each numerical method, we derived a class from \texttt{EquationSolver} and implemented the \texttt{solve()} function accordingly.
+
+The \texttt{Function} class represents mathematical functions and provides:
+
+\begin{itemize}
+    \item An overloaded operator \texttt{operator()} to evaluate the function at a given point.
+    \item A \texttt{derivative()} function that computes the derivative numerically using the central difference method.
+\end{itemize}
+
+% ============================================
+\section*{III. Results}
+
+We tested our implementations on several functions:
+
+\subsection*{III-a. Bisection Method}
+
+\begin{enumerate}
+    \item $f(x) = \dfrac{1}{x} - \tan(x)$ on $[0.1, \dfrac{\pi}{2} - 0.1]$:
+
+    \textbf{Root:} 0.860334
+
+    \item $f(x) = \dfrac{1}{x} - 2x$ on $[0.1, 1]$:
+
+    \textbf{Root:} 0.707107
+
+    \item $f(x) = 2^{-x} + e^{x} + 2\cos(x) - 6$ on $[1, 3]$:
+
+    \textbf{Root:} 1.82938
+
+    \item $f(x) = \dfrac{x^3 + 4x^2 + 3x + 5}{2x^3 - 9x^2 + 18x - 2}$ on $[0, 4]$:
+
+    \textbf{Root:} 0.117877
+\end{enumerate}
+
+\subsection*{III-b. Newton's Method}
+
+We solved $x = \tan(x)$ with initial guesses near 4.5 and 7.7.
+
+\begin{itemize}
+    \item \textbf{Root near 4.5:} 4.49341
+    \item \textbf{Root near 7.7:} 7.72525
+\end{itemize}
+
+\subsection*{III-c. Secant Method}
+
+\begin{enumerate}
+    \item $f(x) = \sin\left(\dfrac{x}{2}\right) - 1$ with $x_0 = 0$, $x_1 = \dfrac{\pi}{2}$:
+
+    \textbf{Root:} 3.14159
+
+    \item $f(x) = e^{x} - \tan(x)$ with $x_0 = 1$, $x_1 = 1.4$:
+
+    \textbf{Root:} 1.11415
+
+    \item $f(x) = x^3 - 12x^2 + 3x + 1$ with $x_0 = 0$, $x_1 = -0.5$:
+
+    \textbf{Root:} 0.0833333
+\end{enumerate}
+
+\subsection*{III-d. Trough Problem}
+
+We found the depth $h$ of water in a trough using all three methods.
+
+\begin{itemize}
+    \item \textbf{Bisection method $h$:} 0.677453
+    \item \textbf{Newton's method $h$:} 0.677453
+    \item \textbf{Secant method $h$:} 0.677453
+\end{itemize}
+
+\subsection*{III-e. Nose-In Failure Problem}
+
+\begin{enumerate}
+    \item \textbf{Problem F(a):} With $l = 89$ in, $h = 49$ in, $D = 55$ in, $\beta_1 = 11.5^\circ$.
+
+    Calculated $\alpha$: 33.0001 degrees
+
+    \item \textbf{Problem F(b):} With $D = 30$ in.
+
+    Calculated $\alpha$: 51.1393 degrees
+
+    \item \textbf{Problem F(c):} Using the secant method with initial guesses far from $33^\circ$.
+
+    Calculated $\alpha$: 51.1393 degrees
+
+    \textbf{Discussion:} When the initial guesses are too far from the actual root, the secant method may converge to a different root or fail to converge due to the nonlinearity of the function.
+\end{enumerate}
+
+% ===============================================
+\section*{IV. Conclusion}
+
+The implementations of the bisection method, Newton's method, and the secant method successfully solved the given nonlinear equations. The results demonstrate the effectiveness of these numerical methods in finding roots under different conditions.
+
+% ===============================================
+\section*{\centerline{Acknowledgement}}
+
+I would like to thank ChatGPT for providing guidance on Cpp programming.
+
+\end{document}

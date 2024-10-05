@@ -1,0 +1,25 @@
+
+### 文件7：.gitignore
+```markdown
+# Ignore object files and executables
+*.o
+solver
+
+# Ignore LaTeX build files
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.bbl
+*.blg
+*.run.xml
+*.txt
+*.exe
+# Ignore output files
+output.txt
+
+# Ignore PDFs
+*.pdf
+
+./vscode

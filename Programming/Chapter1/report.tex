@@ -14,20 +14,20 @@
 
 \author{Bince Qu 3220105862
   \thanks{Electronic address: \texttt{3220105862@zju.edu.cn}}}
-\affil{Collage of Mathmatics, Zhejiang University }
+\affil{College of Mathematics, Zhejiang University}
 
 \date{Due time: \today}
 
 \maketitle
 
 \begin{abstract}
-    In this project, we implemented the bisection method, Newton's method, and the secant method in C++ to solve nonlinear equations. We tested our implementations on various functions and intervals, and analyzed the results.
+    In this project, I implemented the bisection method, Newton's method, and the secant method in C++ to solve nonlinear equations. I tested my implementations on various functions and intervals, and analyzed the results. Notably, while the bisection method worked consistently, Newton's and Secant methods encountered convergence issues for certain functions, likely due to initial guesses or numerical instability.
 \end{abstract}
 
 % ============================================
 \section*{I. Briefly Repeat the Problem}
 
-The objective is to implement the bisection method, Newton's method, and the secant method in a C++ package. We need to:
+The objective is to implement the bisection method, Newton's method, and the secant method in a C++ package. I need to:
 
 \begin{itemize}
     \item Design an abstract base class \texttt{EquationSolver} with a pure virtual method \texttt{solve}.
@@ -38,7 +38,7 @@ The objective is to implement the bisection method, Newton's method, and the sec
 % ============================================
 \section*{II. Implementation Details}
 
-We designed an abstract base class \texttt{EquationSolver} with a pure virtual function \texttt{solve()}. For each numerical method, we derived a class from \texttt{EquationSolver} and implemented the \texttt{solve()} function accordingly.
+I designed an abstract base class \texttt{EquationSolver} with a pure virtual function \texttt{solve()}. For each numerical method, I derived a class from \texttt{EquationSolver} and implemented the \texttt{solve()} function accordingly.
 
 The \texttt{Function} class represents mathematical functions and provides:
 
@@ -47,92 +47,100 @@ The \texttt{Function} class represents mathematical functions and provides:
     \item A \texttt{derivative()} function that computes the derivative numerically using the central difference method.
 \end{itemize}
 
+The methods were tested on various functions such as trigonometric functions, polynomials, and exponential functions.
+
 % ============================================
 \section*{III. Results}
 
-We tested our implementations on several functions:
+I tested my implementations on several functions, and the results for each method are as follows:
 
 \subsection*{III-a. Bisection Method}
 
 \begin{enumerate}
     \item $f(x) = \dfrac{1}{x} - \tan(x)$ on $[0.1, \dfrac{\pi}{2} - 0.1]$:
 
-    \textbf{Root:} 0.860334
+    \textbf{Root:} 0.859694
 
     \item $f(x) = \dfrac{1}{x} - 2x$ on $[0.1, 1]$:
 
-    \textbf{Root:} 0.707107
+    \textbf{Root:} 0.707324
 
     \item $f(x) = 2^{-x} + e^{x} + 2\cos(x) - 6$ on $[1, 3]$:
 
-    \textbf{Root:} 1.82938
+    \textbf{Root:} 1.8291
 
     \item $f(x) = \dfrac{x^3 + 4x^2 + 3x + 5}{2x^3 - 9x^2 + 18x - 2}$ on $[0, 4]$:
 
-    \textbf{Root:} 0.117877
+    \textbf{Root:} 0.118164
 \end{enumerate}
 
 \subsection*{III-b. Newton's Method}
 
-We solved $x = \tan(x)$ with initial guesses near 4.5 and 7.7.
+I solved $x = \tan(x)$ with initial guesses near 4.5 and 7.7.
 
 \begin{itemize}
     \item \textbf{Root near 4.5:} 4.49341
     \item \textbf{Root near 7.7:} 7.72525
 \end{itemize}
 
+However, for other functions such as the Trough Problem, Newton's method failed to converge due to numerical issues and returned `nan`. This failure likely resulted from either a zero derivative or an initial guess that was too far from the actual root.
+
 \subsection*{III-c. Secant Method}
 
+I solved several equations using the Secant method with different initial values:
+
 \begin{enumerate}
-    \item $f(x) = \sin\left(\dfrac{x}{2}\right) - 1$ with $x_0 = 0$, $x_1 = \dfrac{\pi}{2}$:
+    \item $f(x) = \sin\left(\dfrac{x}{2}\right) - 1$ with $x_0 = 2$, $x_1 = 4$:
 
     \textbf{Root:} 3.14159
 
     \item $f(x) = e^{x} - \tan(x)$ with $x_0 = 1$, $x_1 = 1.4$:
 
-    \textbf{Root:} 1.11415
+    \textbf{Root:} 1.30633
 
     \item $f(x) = x^3 - 12x^2 + 3x + 1$ with $x_0 = 0$, $x_1 = -0.5$:
 
-    \textbf{Root:} 0.0833333
+    \textbf{Root:} -0.188685
 \end{enumerate}
+
+Similar to Newton's method, the Secant method encountered convergence issues for the Trough Problem and returned `nan`. This suggests that small differences between successive function values caused the denominator in the Secant formula to become too small, preventing successful convergence.
 
 \subsection*{III-d. Trough Problem}
 
-We found the depth $h$ of water in a trough using all three methods.
+I found the depth $h$ of water in a trough using all three methods:
 
 \begin{itemize}
-    \item \textbf{Bisection method $h$:} 0.677453
-    \item \textbf{Newton's method $h$:} 0.677453
-    \item \textbf{Secant method $h$:} 0.677453
+    \item \textbf{Bisection method $h$:} 0.985352
+    \item \textbf{Newton's method $h$:} \textit{nan} (Failed to converge)
+    \item \textbf{Secant method $h$:} \textit{nan} (Failed to converge)
 \end{itemize}
+
+For this particular problem, the Bisection method was successful, but both Newton's and Secant methods failed to converge, likely due to difficulties in handling the nonlinear behavior of the trough's volume function near the root.
 
 \subsection*{III-e. Nose-In Failure Problem}
 
+For the Nose-In Failure problem, I tested different initial guesses for $\alpha$:
+
 \begin{enumerate}
-    \item \textbf{Problem F(a):} With $l = 89$ in, $h = 49$ in, $D = 55$ in, $\beta_1 = 11.5^\circ$.
+    \item \textbf{Problem F(a):} Initial guess: $33^\circ$. Calculated $\alpha$: 32.9722 degrees
+    \item \textbf{Problem F(b):} Initial guess: $33^\circ$. Calculated $\alpha$: 33.1689 degrees
+    \item \textbf{Problem F(c):} Using the Secant method with initial guesses far from $33^\circ$:
 
-    Calculated $\alpha$: 33.0001 degrees
+    - Initial guess: $60^\circ$. Calculated $\alpha$: 33.1689 degrees
+    - Initial guess: $70^\circ$. Calculated $\alpha$: 33.1689 degrees
+    - Initial guess: $80^\circ$. Calculated $\alpha$: 33.1689 degrees
 
-    \item \textbf{Problem F(b):} With $D = 30$ in.
-
-    Calculated $\alpha$: 51.1393 degrees
-
-    \item \textbf{Problem F(c):} Using the secant method with initial guesses far from $33^\circ$.
-
-    Calculated $\alpha$: 51.1393 degrees
-
-    \textbf{Discussion:} When the initial guesses are too far from the actual root, the secant method may converge to a different root or fail to converge due to the nonlinearity of the function.
+    \textbf{Discussion:} The results show that the Secant method converged to the same root, despite the initial guesses being far from the actual root. However, this method sometimes converges to different roots depending on the nonlinearity of the function and the initial values.
 \end{enumerate}
 
 % ===============================================
 \section*{IV. Conclusion}
 
-The implementations of the bisection method, Newton's method, and the secant method successfully solved the given nonlinear equations. The results demonstrate the effectiveness of these numerical methods in finding roots under different conditions.
+The implementations of the bisection method, Newton's method, and the secant method successfully solved most of the given nonlinear equations. The bisection method consistently produced accurate results, while Newton's and Secant methods faced convergence issues for more complex problems like the Trough Problem. These issues are likely due to poor initial guesses or small numerical differences, which could be addressed by adjusting the algorithms to handle these situations better.
 
 % ===============================================
 \section*{\centerline{Acknowledgement}}
 
-I would like to thank ChatGPT for providing guidance on Cpp programming.
+I would like to thank ChatGPT for providing guidance on C++ programming.
 
 \end{document}

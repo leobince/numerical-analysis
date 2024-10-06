@@ -4,6 +4,7 @@
 #include "Function.hpp"
 #include <cmath>
 #include <stdexcept>
+#include <iostream>  // Include for debugging
 
 class EquationSolver{
 protected:
@@ -20,7 +21,7 @@ private:
     int Maxiter;
 public:
     Bisection_Method(const Function &F, double a, double b, 
-        double eps = 1e-7, double delta = 1e-6, int Maxiter = 50) :
+        double eps = 1e-7, double delta = 1e-6, int Maxiter = 100) :
         EquationSolver(F), a(a), b(b), eps(eps), delta(delta), Maxiter(Maxiter) {}
     
     virtual double solve() {
@@ -55,7 +56,7 @@ private:
     int Maxiter;
 public:
     Newton_Method(const Function &F, double x0, 
-        double eps = 1e-7, int Maxiter = 50) :
+        double eps = 1e-7, int Maxiter = 1000000) :
         EquationSolver(F), x0(x0), eps(eps), Maxiter(Maxiter) {}
     
     virtual double solve() {
@@ -64,7 +65,8 @@ public:
             double fx = F(x);
             double dfx = F.derivative(x);
             if (fabs(dfx) < 1e-12) {
-                throw std::runtime_error("Derivative too small, cannot continue iteration.");
+                // Instead of throwing an exception, adjust dfx slightly
+                dfx = (dfx >= 0) ? 1e-12 : -1e-12;
             }
             double dx = fx / dfx;
             x -= dx;
@@ -72,6 +74,7 @@ public:
                 return x;
             }
         }
+        std::cerr << "Newton's method did not converge within the maximum number of iterations." << std::endl;
         return x;
     }
 };
@@ -83,20 +86,21 @@ private:
     int Maxiter;
 public:
     Secant_Method(const Function &F, double x0, double x1,
-        double eps = 1e-7, int Maxiter = 50) :
+        double eps = 1e-7, int Maxiter = 1000000) :
         EquationSolver(F), x0(x0), x1(x1), eps(eps), Maxiter(Maxiter) {}
-
+    
     virtual double solve() {
         double x_prev = x0;
         double x_curr = x1;
         double f_prev = F(x_prev);
         double f_curr = F(x_curr);
         for (int iter = 0; iter < Maxiter; ++iter) {
-            if (fabs(f_curr - f_prev) < 1e-12) {
-                // If denominator is too small, adjust f_curr slightly
-                f_curr += 1e-12;
+            double denominator = (f_curr - f_prev);
+            if (fabs(denominator) < 1e-12) {
+                // Adjust denominator slightly to avoid division by zero
+                denominator = (denominator >= 0) ? 1e-12 : -1e-12;
             }
-            double x_next = x_curr - f_curr * (x_curr - x_prev) / (f_curr - f_prev);
+            double x_next = x_curr - f_curr * (x_curr - x_prev) / denominator;
             if (fabs(x_next - x_curr) < eps) {
                 return x_next;
             }
@@ -105,6 +109,7 @@ public:
             f_prev = f_curr;
             f_curr = F(x_curr);
         }
+        std::cerr << "Secant method did not converge within the maximum number of iterations." << std::endl;
         return x_curr;
     }
 };

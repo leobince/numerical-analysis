@@ -2,6 +2,7 @@
 #include "EquationSolver.hpp"
 #include <iostream>
 #include <cmath>
+#include <limits> 
 
 const double Pi = acos(-1.0);
 
@@ -91,6 +92,10 @@ void solve_f6_secant() {
     Secant_Method solver_f6(F6(), 2, 4);
     double x = solver_f6.solve();
     std::cout << "Root: " << x << std::endl;
+    std::cout << "Using Secant method to solve sin(x/2) - 1, initial values x0 = 3, x1 = 5" << std::endl;
+    Secant_Method solver_f6_2(F6(), 3, 5);
+    double y = solver_f6_2.solve();
+    std::cout << "Root: " << y << std::endl;
 }
 
 class F7 : public Function {
@@ -105,6 +110,10 @@ void solve_f7_secant() {
     Secant_Method solver_f7(F7(), 1, 1.4);
     double x = solver_f7.solve();
     std::cout << "Root: " << x << std::endl;
+    std::cout << "Using Secant method to solve e^{x} - tan(x), initial values x0 = 2, x1 = 3" << std::endl;
+    Secant_Method solver_f7_2(F7(), 2, 3);
+    double y = solver_f7_2.solve();
+    std::cout << "Root: " << y << std::endl;
 }
 
 class F8 : public Function {
@@ -119,6 +128,10 @@ void solve_f8_secant() {
     Secant_Method solver_f8(F8(), 0, -0.5);
     double x = solver_f8.solve();
     std::cout << "Root: " << x << std::endl;
+    std::cout << "Using Secant method to solve x^3 - 12x^2 + 3x + 1, initial values x0 = 1, x1 = 0.5" << std::endl;
+    Secant_Method solver_f8_2(F8(), 1, 0.5);
+    double y = solver_f8_2.solve();
+    std::cout << "Root: " << y << std::endl;
 }
 
 class TroughVolumeFunction : public Function {
@@ -130,6 +143,11 @@ public:
     TroughVolumeFunction(double L, double r, double V) : L(L), r(r), V(V) {}
 
     double operator() (double h) const {
+        // Ensure h is within a valid range [0, r]
+        if (h < 0 || h > r) {
+            return std::numeric_limits<double>::infinity();
+        }
+
         double theta = acos(h / r);
         double area = 0.5 * Pi * r * r - r * r * theta - h * sqrt(r * r - h * h);
         return L * area - V;
@@ -144,17 +162,17 @@ void solve_trough_volume() {
     TroughVolumeFunction F(L, r, V);
 
     // Bisection method
-    Bisection_Method bisection_solver(F, 0, r);
+    Bisection_Method bisection_solver(F, 0.0, r);
     double h_bisect = bisection_solver.solve();
     std::cout << "Bisection method h = " << h_bisect << std::endl;
 
     // Newton's method
-    Newton_Method newton_solver(F, r / 2);
+    Newton_Method newton_solver(F, r / 2.0);
     double h_newton = newton_solver.solve();
     std::cout << "Newton's method h = " << h_newton << std::endl;
 
     // Secant method
-    Secant_Method secant_solver(F, 0, r);
+    Secant_Method secant_solver(F, 0.1, r);
     double h_secant = secant_solver.solve();
     std::cout << "Secant method h = " << h_secant << std::endl;
 }
@@ -181,7 +199,7 @@ void solve_nose_in_failure(double l, double h, double D, double beta1_deg, doubl
     NoseInFailureFunction F(A, B, C, E);
     Newton_Method newton_solver(F, initial_guess);
     double alpha = newton_solver.solve();
-    std::cout << "Alpha (degrees) = " << alpha << std::endl;
+    std::cout <<"When initial_guess = " << initial_guess << "     Alpha (degrees) = " << alpha << std::endl;
 }
 
 void solve_nose_in_failure_secant(double l, double h, double D, double beta1_deg, double x0, double x1) {
@@ -194,7 +212,7 @@ void solve_nose_in_failure_secant(double l, double h, double D, double beta1_deg
     NoseInFailureFunction F(A, B, C, E);
     Secant_Method secant_solver(F, x0, x1);
     double alpha = secant_solver.solve();
-    std::cout << "Alpha (degrees) = " << alpha << std::endl;
+    std::cout <<"When initial_guess = " << x1 << "      Alpha (degrees) = " << alpha << std::endl;
 }
 
 int main() {
@@ -220,6 +238,8 @@ int main() {
     std::cout << "Problem F(c):" << std::endl;
     // Using Secant method with initial guesses far from 33 degrees
     solve_nose_in_failure_secant(89, 49, 30, 11.5, 10.0, 60.0);
+    solve_nose_in_failure_secant(89, 49, 30, 11.5, 10.0, 70.0);
+    solve_nose_in_failure_secant(89, 49, 30, 11.5, 10.0, 80.0);
 
     return 0;
 }

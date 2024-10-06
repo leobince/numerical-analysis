@@ -1,6 +1,6 @@
 
 ### 文件7：.gitignore
-```markdown
+#```markdown
 # Ignore object files and executables
 *.o
 solver

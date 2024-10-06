@@ -25,16 +25,19 @@ To run the program and save the output to output.txt:
 ```bash
 make run
 ```
+
 To compile the report into a PDF:
 
 ```bash
 make report
 ```
+
 To clean up generated files:
 
 ```bash
 make clean
 ```
+
 ## Requirements
 C++ compiler (e.g., g++)
 LaTeX distribution (e.g., TeX Live, MiKTeX) for compiling the report.

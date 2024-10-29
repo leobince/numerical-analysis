@@ -1,4 +1,3 @@
-// F_HeartBezier.cpp
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -9,13 +8,17 @@
 #endif
 
 // Function to generate marker points on the heart curve
-void generateMarkerPoints(std::vector<double>& x_vals, std::vector<double>& y_vals, std::vector<double>& t_vals, int m) {
+void generateMarkerPoints(std::vector<double>& x_vals, std::vector<double>& y_vals,
+                          std::vector<double>& t_vals, int m) {
+    const double sqrt_3 = std::sqrt(3.0);
+    double delta_t = (2 * M_PI) / m;
+
     for (int i = 0; i <= m; ++i) {
-        double t = (2 * M_PI * i) / m; // Parameter t
+        double t = i * delta_t; // Parameter t
         t_vals.push_back(t);
 
-        double x = pow(sin(t), 3);
-        double y = (13 * cos(t) - 5 * cos(2 * t) - 2 * cos(3 * t) - cos(4 * t)) / 17.0;
+        double x = sqrt_3 * std::cos(t);
+        double y = (2.0 / 3.0) * (sqrt_3 * std::sin(t) + std::sqrt(sqrt_3 * std::fabs(std::cos(t))));
 
         x_vals.push_back(x);
         y_vals.push_back(y);
@@ -23,25 +26,39 @@ void generateMarkerPoints(std::vector<double>& x_vals, std::vector<double>& y_va
 }
 
 // Function to compute the tangent vectors at each marker point
-void computeTangents(const std::vector<double>& x_vals, const std::vector<double>& y_vals,
-                     std::vector<double>& dx_vals, std::vector<double>& dy_vals,
-                     const std::vector<double>& t_vals) {
-    size_t n = x_vals.size();
+void computeTangents(const std::vector<double>& t_vals,
+                     std::vector<double>& dx_vals, std::vector<double>& dy_vals, int m) {
+    const double sqrt_3 = std::sqrt(3.0);
+    double delta_t = (2 * M_PI) / m;
 
-    for (size_t i = 0; i < n; ++i) {
+    for (size_t i = 0; i < t_vals.size(); ++i) {
         double t = t_vals[i];
-        double dx_dt = 3 * pow(sin(t), 2) * cos(t);
-        double dy_dt = (1.0 / 17.0) * (-13 * sin(t) + 10 * sin(2 * t) + 6 * sin(3 * t) + 4 * sin(4 * t));
 
-        // Tangent vector components dx/dt and dy/dt
-        double dx = dx_dt;
-        double dy = dy_dt;
+        // Compute dx/dt
+        double dx_dt = -sqrt_3 * std::sin(t);
 
-        // Compute dy/dx
-        // Not needed since we're using parametric form, but we can normalize the vector
-        double length = sqrt(dx * dx + dy * dy);
-        dx_vals.push_back(dx / length);
-        dy_vals.push_back(dy / length);
+        // Compute dy/dt
+        double cos_t = std::cos(t);
+        double sin_t = std::sin(t);
+        double abs_cos_t = std::fabs(cos_t);
+
+        double dy_dt;
+
+        if (abs_cos_t > 1e-8) { // Avoid division by zero
+            double sqrt_term = std::sqrt(sqrt_3 * abs_cos_t);
+            double sqrt_derivative = - (sqrt_3 * sin_t * ((cos_t >= 0) ? 1.0 : -1.0)) / (2.0 * sqrt_term);
+            dy_dt = (2.0 / 3.0) * (sqrt_3 * cos_t + sqrt_derivative);
+        } else {
+            // When cos_t is close to zero
+            dy_dt = (2.0 / 3.0) * sqrt_3 * cos_t;
+        }
+
+        // Scale the tangent vector by delta_t
+        dx_dt *= delta_t;
+        dy_dt *= delta_t;
+
+        dx_vals.push_back(dx_dt);
+        dy_vals.push_back(dy_dt);
     }
 }
 
@@ -56,14 +73,22 @@ void computeControlPoints(const std::vector<double>& x_vals, const std::vector<d
         double px0 = x_vals[j];
         double py0 = y_vals[j];
 
-        double px1 = px0 + dx_vals[j] / 3.0;
-        double py1 = py0 + dy_vals[j] / 3.0;
+        // Scaled tangent vectors
+        double T_x_j = dx_vals[j];
+        double T_y_j = dy_vals[j];
+
+        double T_x_j1 = dx_vals[j + 1];
+        double T_y_j1 = dy_vals[j + 1];
+
+        // Compute control points
+        double px1 = px0 + T_x_j / 3.0;
+        double py1 = py0 + T_y_j / 3.0;
 
         double px3 = x_vals[j + 1];
         double py3 = y_vals[j + 1];
 
-        double px2 = px3 - dx_vals[j + 1] / 3.0;
-        double py2 = py3 - dy_vals[j + 1] / 3.0;
+        double px2 = px3 - T_x_j1 / 3.0;
+        double py2 = py3 - T_y_j1 / 3.0;
 
         // Store the control points for this segment
         qx_vals.push_back({px0, px1, px2, px3});
@@ -114,7 +139,7 @@ int main() {
         // Compute tangent vectors at marker points
         std::vector<double> dx_vals;
         std::vector<double> dy_vals;
-        computeTangents(x_vals, y_vals, dx_vals, dy_vals, t_vals);
+        computeTangents(t_vals, dx_vals, dy_vals, m);
 
         // Compute control points for cubic Bézier curves
         std::vector<std::vector<double>> qx_vals;

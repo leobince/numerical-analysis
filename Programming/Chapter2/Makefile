@@ -1,4 +1,4 @@
-# Makefile for Compiling, Running, and Plotting Refactored Tasks A-F
+# Makefile for Compiling, Running, and Plotting Refactored Tasks A-F and Building the Report
 
 # Compiler and flags
 CXX = g++
@@ -30,7 +30,10 @@ PLOTS = runge_plot.png \
         heart_plot_m40.png \
         heart_plot_m160.png
 
-.PHONY: all run plot clean
+# Report
+REPORT = Report.pdf
+
+.PHONY: all run plot report clean
 
 # Default target
 all: $(PROGRAMS)
@@ -51,8 +54,8 @@ D_HermiteInterpolation: D_HermiteInterpolation.cpp $(SOURCES) $(HEADERS)
 E_LarvaeGrowth: E_LarvaeGrowth.cpp $(SOURCES) $(HEADERS)
 	$(CXX) $(CXXFLAGS) -o $@ $< $(SOURCES)
 
-F_HeartBezier: F_HeartBezier.cpp $(SOURCES) $(HEADERS)
-	$(CXX) $(CXXFLAGS) -o $@ $< $(SOURCES) -lm
+F_HeartBezier: F_HeartBezier.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $< -lm
 
 # Running programs
 run: all
@@ -72,9 +75,25 @@ run: all
 # Plotting
 plot: run $(PLOTS)
 
-$(PLOTS): %.png: %.plt
-	@echo "Generating plot $@"
-	gnuplot $<
+# Explicit plot rules
+runge_plot.png: plot_run.plt runge_exact.txt runge_poly_n2.txt runge_poly_n4.txt runge_poly_n6.txt runge_poly_n8.txt
+	@echo "Generating runge_plot.png..."
+	gnuplot plot_run.plt
+
+chebyshev_plot.png: plot_cheb.plt chebyshev_exact.txt chebyshev_poly_n5.txt chebyshev_poly_n10.txt chebyshev_poly_n15.txt chebyshev_poly_n20.txt
+	@echo "Generating chebyshev_plot.png..."
+	gnuplot plot_cheb.plt
+
+heart_plot_m10.png heart_plot_m40.png heart_plot_m160.png: plot_heart.plt heart_bezier_m10.txt heart_bezier_m40.txt heart_bezier_m160.txt
+	@echo "Generating heart plots..."
+	gnuplot plot_heart.plt
+
+# Build the report
+report: plot $(REPORT)
+
+$(REPORT): Report.tex $(PLOTS) hermite_output.txt larvae_output.txt
+	pdflatex Report.tex
+	pdflatex Report.tex
 
 # Clean generated files
 clean:
@@ -83,6 +102,7 @@ clean:
 	rm -f larvae_output.txt
 	rm -f runge_exact.txt runge_poly_n*.txt
 	rm -f chebyshev_exact.txt chebyshev_poly_n*.txt
-	rm -f heart_m*.txt
+	rm -f heart_bezier_m*.txt
 	rm -f $(PLOTS)
 	rm -f *.o
+	rm -f Report.aux Report.log Report.pdf

@@ -10,7 +10,9 @@ double f(double x) {
 }
 
 int main() {
-    int n = 8; // Number of data points
+
+//use B to test if A works
+    int n = 100; // Number of data points
     std::vector<double> x(n);
     std::vector<double> y(n);
 
